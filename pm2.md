@@ -89,6 +89,32 @@ module.exports = {
 }
 ```
 
+## Applying Environment Variable Changes
+
+When you update `env` values in `ecosystem.config.js`, a plain `pm2 restart` **will not** pick up the new values. You must use the `--update-env` flag:
+
+```bash
+# Reload with zero downtime (recommended for production)
+pm2 reload ecosystem.config.js --update-env
+
+# OR restart (brief downtime)
+pm2 restart ecosystem.config.js --update-env
+```
+
+To target a specific app by name:
+```bash
+pm2 reload app1 --update-env
+```
+
+To switch to a named env block (e.g. `env_production`):
+```bash
+pm2 restart ecosystem.config.js --env production --update-env
+```
+
+> **Note:** After applying changes, run `pm2 save` to persist the new env state across reboots.
+
+---
+
 ## Log Management
 
 ### View Logs
