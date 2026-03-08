@@ -119,18 +119,19 @@ pm2 restart ecosystem.config.js --env production --update-env
 
 ### View Logs
 ```bash
-pm2 logs            # All logs
-pm2 logs [id/name]  # Specific app logs
-pm2 flush           # Clear all logs
+pm2 logs            # Stream real-time stdout & stderr from ALL managed processes (Ctrl+C to stop)
+pm2 logs [id/name]  # Stream logs for a single app — pass its numeric id (e.g. 0) or name (e.g. "my-api")
+pm2 flush           # Truncate (delete contents of) every log file for all processes — frees disk space
 ```
 
 ### Log Rotation
 To handle large execution logs, it's recommended to install `pm2-logrotate`:
 
 ```bash
+# Install the pm2-logrotate module — automatically splits log files to prevent them from growing too large
 pm2 install pm2-logrotate
 
 # Configure rotation (optional)
-pm2 set pm2-logrotate:max_size 10M
-pm2 set pm2-logrotate:retain 30
+pm2 set pm2-logrotate:max_size 10M   # Rotate (archive & start fresh) when a log file exceeds 10 MB
+pm2 set pm2-logrotate:retain 30      # Keep at most 30 rotated log files per app; older ones are deleted
 ```
