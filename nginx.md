@@ -37,7 +37,7 @@ Use this when your site is a static build (e.g. HTML/CSS/JS output from Vite, Ne
 ### Create the config
 
 ```bash
-sudo nano /etc/nginx/sites-available/api.anzdevelopers.com
+sudo nano /etc/nginx/sites-available/games.anzdevelopers.com
 ```
 
 ```nginx
@@ -45,9 +45,9 @@ server {
     listen 80;
     listen [::]:80;
 
-    server_name anzdevelopers.com www.anzdevelopers.com;
+    server_name games.anzdevelopers.com www.games.anzdevelopers.com;
 
-    root /var/www/anzdevelopers.com;
+    root /var/www/games.anzdevelopers.com;
     index index.html index.htm;
 
     location / {
@@ -95,10 +95,10 @@ server {
     listen 80;
     listen [::]:80;
 
-    server_name api.anzdevelopers.com;
+    server_name games.anzdevelopers.com;
 
     location / {
-        proxy_pass http://localhost:3434;
+        proxy_pass http://localhost:9000;
 
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -122,7 +122,7 @@ After creating your config in `sites-available/`, enable it:
 
 ```bash
 # Create symlink to enable the site
-sudo ln -s /etc/nginx/sites-available/api.anzdevelopers.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/games.anzdevelopers.com /etc/nginx/sites-enabled/
 
 # Test for syntax errors
 sudo nginx -t
@@ -140,7 +140,7 @@ sudo systemctl reload nginx
 sudo apt install certbot python3-certbot-nginx -y
 
 # Obtain and auto-configure SSL certificate
-sudo certbot --nginx -d api.anzdevelopers.com -d www.anzdevelopers.com -d anzdevelopers.com
+sudo certbot --nginx -d games.anzdevelopers.com -d www.anzdevelopers.com -d anzdevelopers.com
 
 # Certbot will automatically modify your nginx config to handle HTTPS and redirect HTTP → HTTPS
 ```

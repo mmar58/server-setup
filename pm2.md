@@ -132,6 +132,42 @@ To handle large execution logs, it's recommended to install `pm2-logrotate`:
 pm2 install pm2-logrotate
 
 # Configure rotation (optional)
-pm2 set pm2-logrotate:max_size 10M   # Rotate (archive & start fresh) when a log file exceeds 10 MB
-pm2 set pm2-logrotate:retain 30      # Keep at most 30 rotated log files per app; older ones are deleted
+pm2 set pm2-logrotate:max_size 2M   # Rotate (archive & start fresh) when a log file exceeds 2 MB
+pm2 set pm2-logrotate:retain 6      # Keep at most 6 rotated log files per app; older ones are deleted
+```
+
+---
+
+## Updating PM2
+
+When a new version of PM2 is released, follow these steps to update safely without losing your running processes:
+
+```bash
+# 1. Save the current process list so it can be restored after the update
+pm2 save
+
+# 2. Install the latest version globally
+npm install pm2@latest -g
+# OR with pnpm
+pnpm add -g pm2
+
+# 3. Update the in-memory PM2 daemon to match the newly installed version
+pm2 update
+```
+
+> **Note:** `pm2 update` will respawn all previously saved processes automatically, so there is minimal downtime.
+
+### Regenerate the Startup Script
+
+After a major PM2 update, it's a good idea to regenerate the startup script to ensure compatibility:
+
+```bash
+# 1. Remove the old startup hook
+pm2 unstartup
+
+# 2. Generate a new startup hook (copy/paste the output command)
+pm2 startup
+
+# 3. Save the current process list again
+pm2 save
 ```
