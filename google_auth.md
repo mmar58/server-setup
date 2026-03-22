@@ -106,10 +106,10 @@ Save and close the file.
 Apply your new SSH configuration by restarting the SSH service:
 
 ```bash
-sudo systemctl restart sshd
+sudo systemctl restart ssh
 ```
 
-*(Or `sudo systemctl restart ssh` on some distributions like Ubuntu).*
+*(On CentOS/RHEL/AlmaLinux the service is called `sshd` instead: `sudo systemctl restart sshd`).*
 
 ---
 
