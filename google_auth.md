@@ -142,6 +142,24 @@ If you are able to log in successfully, it is safe to close your initial, active
 
 ---
 
+## Logging In With SFTP Clients (e.g., FileZilla or WinSCP)
+
+If you use FileZilla or another SFTP client to transfer files, you may encounter an error like: `"Server sent an additional login prompt. You need to use the interactive login type."`
+
+This happens because the standard password login doesn't know how to ask for the 6-digit Authenticator code.
+
+**How to fix it in FileZilla:**
+1. Open the **Site Manager** (`File` > `Site Manager` or `Ctrl+S`).
+2. Select your server connection.
+3. In the **General** tab, find the **Logon Type** dropdown.
+4. Change it from `Normal` (or `Ask for password`) to **Interactive**.
+5. Ensure your User (e.g., `root` or `username`) is filled in.
+6. Click **Connect**. 
+
+FileZilla will now prompt you for your password first, and immediately after, it will pop up a second prompt asking for your **Verification code** (the 6-digit Google Authenticator code).
+
+---
+
 ## Recovery: What to Do If You Lose Your Authenticator
 
 If you lose your phone or the authenticator app, you can't generate the 6-digit code anymore. Here's how to recover access:
