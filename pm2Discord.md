@@ -67,3 +67,48 @@ If you want more "stylish" embeds (colored messages for errors vs. info) or want
 * **Too many messages?** Discord has a rate limit. If your app is throwing 100 errors a second, Discord will block the webhook temporarily. Use `pm2 set pm2-discord:buffer_seconds 5` to group messages together.
 
 **Would you like me to show you how to set up a custom script to send only specific "Critical" errors instead of every log?**
+
+---
+
+### How to stop PM2 Discord logs
+
+You can either temporarily disable alerts or remove the integration entirely.
+
+- Temporary: disable specific alerts (no uninstall)
+
+```bash
+# Disable error, restart and standard log notifications
+pm2 set pm2-discord:error false
+pm2 set pm2-discord:restart false
+pm2 set pm2-discord:log false
+
+# Restart the module to apply changes
+pm2 restart pm2-discord
+```
+
+- Quick off: remove the webhook URL (safe temporary stop)
+
+```bash
+pm2 set pm2-discord:discord_url ""
+pm2 restart pm2-discord
+```
+
+- Permanent: uninstall the PM2 module
+
+```bash
+pm2 uninstall pm2-discord
+```
+
+- Notes and checks
+
+```bash
+# See installed modules / processes
+pm2 list
+
+# Inspect current pm2-discord settings
+pm2 get pm2-discord:discord_url
+pm2 get pm2-discord:error
+pm2 get pm2-discord:restart
+```
+
+If you used `pm2-discord-plus` instead, replace `pm2-discord` with `pm2-discord-plus` in the commands above.
