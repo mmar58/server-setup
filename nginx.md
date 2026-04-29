@@ -49,7 +49,7 @@ server {
     listen 80;
     listen [::]:80;
 
-    server_name socialapp.anzdevelopers.com
+    server_name socialapp.anzdevelopers.com;
 
     root /var/www/socialapp.anzdevelopers.com;
     index index.html index.htm;
@@ -75,7 +75,7 @@ sudo mkdir -p /var/www/socialapp.anzdevelopers.com
 sudo chown -R $USER:$USER /var/www/socialapp.anzdevelopers.com
 
 # Copy your build output here, e.g.:
-cp -r ./dist/* /var/www/anzdevelopers.com/
+cp -r ./out/* /var/www/socialapp.anzdevelopers.com/
 ```
 
 
@@ -124,7 +124,7 @@ After creating your config in `sites-available/`, enable it:
 
 ```bash
 # Create symlink to enable the site
-sudo ln -s /etc/nginx/sites-available/socailapi.anzdevelopers.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/socialapp.anzdevelopers.com /etc/nginx/sites-enabled/
 
 # Test for syntax errors
 sudo nginx -t
@@ -143,7 +143,7 @@ sudo systemctl reload nginx
 sudo apt install certbot python3-certbot-nginx -y
 
 # Obtain and auto-configure SSL certificate
-sudo certbot --nginx -d socailapi.anzdevelopers.com
+sudo certbot --nginx -d socialapp.anzdevelopers.com
 
 # Certbot will automatically modify your nginx config to handle HTTPS and redirect HTTP → HTTPS
 ```
