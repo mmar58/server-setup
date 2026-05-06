@@ -5,6 +5,7 @@ UPDATE_SYSTEM=true
 INSTALL_NODE=true      # Node.js 24.x & NPM
 INSTALL_TOOLS=true     # pnpm and pm2
 INSTALL_MARIADB=false
+INSTALL_POSTGRESQL=false
 INSTALL_NGINX=true
 
 # Exit on error
@@ -48,7 +49,17 @@ else
     echo "⏭️ Skipping MariaDB Installation"
 fi
 
-# 5. Install Nginx
+# 5. Install PostgreSQL
+if [ "$INSTALL_POSTGRESQL" = true ]; then
+    echo "🐘 Installing PostgreSQL..."
+    sudo apt install -y postgresql postgresql-contrib
+    sudo systemctl start postgresql
+    sudo systemctl enable postgresql
+else
+    echo "⏭️ Skipping PostgreSQL Installation"
+fi
+
+# 6. Install Nginx
 if [ "$INSTALL_NGINX" = true ]; then
     echo "🌐 Installing Nginx..."
     sudo apt install -y nginx
@@ -58,7 +69,7 @@ else
     echo "⏭️ Skipping Nginx Installation"
 fi
 
-# 6. Verify Installations
+# 7. Verify Installations
 echo "✅ Verification:"
 
 if command -v node > /dev/null 2>&1; then echo "Node: $(node -v)"; else echo "Node: Not installed"; fi
@@ -67,5 +78,9 @@ if command -v pnpm > /dev/null 2>&1; then echo "pnpm: $(pnpm -v)"; else echo "pn
 if command -v pm2 > /dev/null 2>&1; then echo "pm2: $(pm2 -v)"; else echo "pm2: Not installed"; fi
 if command -v nginx > /dev/null 2>&1; then echo "nginx: $(nginx -v)"; else echo "nginx: Not installed"; fi
 if command -v mariadb > /dev/null 2>&1; then echo "mariadb: $(mariadb --version)"; else echo "mariadb: Not installed"; fi
+if command -v psql > /dev/null 2>&1; then echo "psql: $(psql --version)"; else echo "psql: Not installed"; fi
 
-echo "🎉 Setup complete! Don't forget to run 'sudo mysql_secure_installation' to secure your database."
+echo "🎉 Setup complete!"
+echo "Next security steps:"
+echo "- MariaDB: sudo mysql_secure_installation"
+echo "- PostgreSQL: sudo -u postgres psql -c \"ALTER USER postgres WITH PASSWORD 'your_strong_password';\""
