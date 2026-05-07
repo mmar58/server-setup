@@ -26,6 +26,7 @@ pnpm add -g pm2
 | `pm2 list` | List all running processes |
 | `pm2 monit` | Monitor memory and CPU |
 | `pm2 logs` | View logs for all processes |
+| `pm2 flush` | Truncate (clear) all log files |
 
 ## Upgrading PM2
 
@@ -133,7 +134,7 @@ pm2 install pm2-logrotate
 
 # Configure rotation (optional)
 pm2 set pm2-logrotate:max_size 2M   # Rotate (archive & start fresh) when a log file exceeds 2 MB
-pm2 set pm2-logrotate:retain 6      # Keep at most 6 rotated log files per app; older ones are deleted
+pm2 set pm2-logrotate:retain 20      # Keep at most 6 rotated log files per app; older ones are deleted
 ```
 
 ---
