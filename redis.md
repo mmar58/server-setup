@@ -16,7 +16,7 @@ Redis is an in-memory data structure store used as a database, cache, and messag
 After install, start the server:
 
 ```
-sudo systemctl enable --now redis
+sudo systemctl enable --now redis-server
 ```
 
 Or with Docker the container starts automatically.
