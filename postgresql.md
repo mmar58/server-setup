@@ -293,3 +293,96 @@ ORDER BY backend_start DESC;
 4. Open firewall `5432` for trusted subnet only
 5. Restart PostgreSQL
 6. Test with `psql` from another machine
+
+## Uninstalling PostgreSQL (Linux)
+
+> Warning: these steps will remove packages and may delete database files. Back up any data you need before proceeding.
+
+### Stop PostgreSQL service
+
+```bash
+sudo systemctl stop postgresql
+sudo systemctl disable postgresql
+```
+
+### Debian / Ubuntu (APT)
+
+- Remove packages but keep data:
+
+```bash
+sudo apt remove -y 'postgresql*'
+```
+
+- Remove packages and purge configuration files:
+
+```bash
+sudo apt purge -y 'postgresql*'  # removes packages and config files
+sudo apt autoremove -y
+```
+
+- Remove data files (irreversible):
+
+```bash
+sudo rm -rf /var/lib/postgresql /etc/postgresql /var/log/postgresql /var/run/postgresql
+sudo deluser --remove-home postgres || sudo userdel -r postgres || true
+```
+
+### RHEL / CentOS / Fedora (DNF/YUM)
+
+```bash
+sudo systemctl stop postgresql
+sudo dnf remove -y postgresql-server postgresql-contrib || sudo yum remove -y postgresql-server postgresql-contrib
+sudo rm -rf /var/lib/pgsql /var/lib/pgsql/data /var/log/postgresql
+sudo userdel -r postgres || true
+```
+
+### Arch Linux (pacman)
+
+```bash
+sudo systemctl stop postgresql
+sudo pacman -Rns --noconfirm postgresql
+sudo rm -rf /var/lib/postgres /var/log/postgres
+sudo userdel -r postgres || true
+```
+
+### Source-based / Custom installs
+
+- If PostgreSQL was compiled from source or installed in a custom prefix, remove the installation directory and data dir manually. Check `which postgres` and `pg_config --bindir`.
+
+### Docker / Container installs
+
+- Remove containers and images:
+
+```bash
+docker rm -f <container_name_or_id>
+docker rmi <image_name_or_id>
+```
+
+- Remove volume if used:
+
+```bash
+docker volume rm <volume_name>
+```
+
+### Clean up apt sources and keys (if you added PostgreSQL repo)
+
+```bash
+# Remove external APT source list (example)
+sudo rm -f /etc/apt/sources.list.d/pgdg.list
+sudo apt-key del <KEYID> || true
+sudo apt update
+```
+
+### Verify removal
+
+```bash
+which psql || echo "psql not found"
+sudo ss -tulpen | grep 5432 || echo "no listener on 5432"
+```
+
+### Notes
+
+- `purge` or `--purge` removes packaged config files; it may not remove database data.
+- Always back up `/var/lib/postgresql` (or your data directory) before deleting.
+- Removing the `postgres` system user may affect other services if they rely on it.
+
