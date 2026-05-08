@@ -38,6 +38,10 @@ Open Laragon Terminal:
 ```bash
 psql -U postgres
 ```
+or
+```bash
+sudo -u postgres psql
+```
 
 Then in psql:
 
