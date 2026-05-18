@@ -41,7 +41,7 @@ Use this when your site is a static build (e.g. HTML/CSS/JS output from Vite, Ne
 ### Create the config
 
 ```bash
-sudo nano /etc/nginx/sites-available/socialapp.anzdevelopers.com
+sudo nano /etc/nginx/sites-available/famstrack.com
 ```
 
 ```nginx
@@ -49,7 +49,7 @@ server {
     listen 80;
     listen [::]:80;
 
-    server_name socialapp.anzdevelopers.com;
+    server_name www.famstrack.com;
 
     root /var/www/socialapp.anzdevelopers.com;
     index index.html index.htm;
@@ -88,7 +88,7 @@ Use this when you have a Node.js (or any other) app running on a local port (e.g
 ### Create the config
 
 ```bash
-sudo nano /etc/nginx/sites-available/socailapi.anzdevelopers.com
+sudo nano /etc/nginx/sites-available/www.famstrack.com
 ```
 
 ```nginx
@@ -96,10 +96,10 @@ server {
     listen 80;
     listen [::]:80;
 
-    server_name socailapi.anzdevelopers.com;
+    server_name testapi.famstrack.com;
 
     location / {
-        proxy_pass http://localhost:5111;
+        proxy_pass http://localhost:4001;
 
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -124,7 +124,7 @@ After creating your config in `sites-available/`, enable it:
 
 ```bash
 # Create symlink to enable the site
-sudo ln -s /etc/nginx/sites-available/socialapp.anzdevelopers.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/www.famstrack.com /etc/nginx/sites-enabled/
 
 # Test for syntax errors
 sudo nginx -t
@@ -143,7 +143,7 @@ sudo systemctl reload nginx
 sudo apt install certbot python3-certbot-nginx -y
 
 # Obtain and auto-configure SSL certificate
-sudo certbot --nginx -d socialapp.anzdevelopers.com
+sudo certbot --nginx -d api.famstrack.com,test.famstrack.com,testapi.famstrack.com
 
 # Certbot will automatically modify your nginx config to handle HTTPS and redirect HTTP → HTTPS
 ```
@@ -297,6 +297,10 @@ sudo systemctl reload nginx
 
 > **Tip:** For selective/on-demand purging without clearing everything, consider the [nginx Cache Purge module](https://nginx.org/en/docs/http/ngx_http_proxy_module.html) or a tool like [nginx-cache-purge](https://github.com/FRiCKLE/ngx_cache_purge).
 
+# Checking nginx error
+```sh
+sudo tail -n 20 /var/log/nginx/error.log
+```
 
 ---
 
