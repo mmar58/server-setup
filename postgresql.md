@@ -1,19 +1,3 @@
-# PostgreSQL setup for local network access (Laragon + Linux)
-
-This guide is optimized for two common setups:
-- Windows + Laragon
-- Linux server (Ubuntu/Debian)
-
-Goal:
-- Run PostgreSQL locally
-- Allow safe access from your local network
-- Verify connectivity quickly
-- Troubleshoot common issues
-
-## Quick decision: which section should you follow?
-
-- If PostgreSQL runs inside Laragon on Windows: use [Section A](#section-a--windows-laragon)
-- If PostgreSQL runs on a Linux machine/VM: use [Section B](#section-b--linux-ubuntudebian)
 
 ## Networking fundamentals (important)
 
