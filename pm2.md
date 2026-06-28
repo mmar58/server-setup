@@ -95,6 +95,7 @@ module.exports = {
 When you update `env` values in `ecosystem.config.js`, a plain `pm2 restart` **will not** pick up the new values. You must use the `--update-env` flag:
 
 ```bash
+pm2 reload ecosystem.config.cjs --only backend --update-env
 # Reload with zero downtime (recommended for production)
 pm2 reload ecosystem.config.js --update-env
 

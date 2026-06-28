@@ -46,7 +46,7 @@ sudo -u postgres psql
 Then in psql:
 
 ```sql
-ALTER USER postgres WITH PASSWORD 'your_new_secure_password';
+ALTER USER postgres WITH PASSWORD '123456';
 \q
 ```
 
