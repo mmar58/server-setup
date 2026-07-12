@@ -184,6 +184,113 @@ psql -h your_linux_ip -p 5432 -U postgres -d postgres
 
 ---
 
+## Section C - macOS (Homebrew)
+
+### C1) Install PostgreSQL
+
+Using [Homebrew](https://brew.sh/):
+
+```bash
+brew update
+brew install postgresql
+```
+
+Start the service so it runs in the background and restarts at login:
+
+```bash
+brew services start postgresql
+```
+
+Check status:
+
+```bash
+brew services info postgresql
+psql --version
+```
+
+### C2) Connect and set password
+
+Homebrew installs PostgreSQL and automatically creates a superuser with your macOS username, rather than a `postgres` user by default. The default database is `postgres`.
+
+Log in:
+
+```bash
+psql postgres
+```
+
+(Optional) Create a `postgres` user for consistency with other systems:
+
+```sql
+CREATE ROLE postgres WITH LOGIN SUPERUSER PASSWORD '123456';
+\q
+```
+
+Or just change your current macOS user's database password:
+
+```sql
+ALTER USER CURRENT_USER WITH PASSWORD 'your_new_secure_password';
+\q
+```
+
+### C3) Locate active config files
+
+```bash
+psql postgres -t -P format=unaligned -c "SHOW config_file;"
+psql postgres -t -P format=unaligned -c "SHOW hba_file;"
+```
+*(Typical locations: `/usr/local/var/postgres/` on Intel Macs, `/opt/homebrew/var/postgres/` on Apple Silicon)*
+
+### C4) Configure network access
+
+Edit `postgresql.conf` (using the path found above):
+
+```ini
+listen_addresses = '*'
+```
+
+Edit `pg_hba.conf` (append at bottom):
+
+```text
+host    all    all    192.168.1.0/24    scram-sha-256
+```
+
+Restart to apply changes:
+
+```bash
+brew services restart postgresql
+```
+
+### C5) Open macOS Firewall
+
+If the built-in macOS Application Firewall is enabled:
+1. Open **System Settings** > **Network** > **Firewall** (or **System Preferences** > **Security & Privacy** > **Firewall** on older versions).
+2. Click **Options...** or **Firewall Options...**
+3. Click the **+** button, press `Cmd + Shift + G`, and enter the path to the `postgres` executable (e.g., `/opt/homebrew/opt/postgresql/bin/postgres` or `/usr/local/opt/postgresql/bin/postgres`).
+4. Set it to **Allow incoming connections**.
+5. Click **OK**.
+
+### C6) Verify listener and remote access
+
+Check if it's listening on port 5432:
+
+```bash
+lsof -i :5432
+```
+
+Find local IP:
+
+```bash
+ipconfig getifaddr en0
+```
+
+Remote test from another machine on the LAN:
+
+```bash
+psql -h your_mac_ip -p 5432 -U postgres -d postgres
+```
+
+---
+
 ## Client connection settings
 
 Use pgAdmin, DBeaver, HeidiSQL, TablePlus, or `psql`:
@@ -331,6 +438,20 @@ sudo systemctl stop postgresql
 sudo pacman -Rns --noconfirm postgresql
 sudo rm -rf /var/lib/postgres /var/log/postgres
 sudo userdel -r postgres || true
+```
+
+### macOS (Homebrew)
+
+```bash
+brew services stop postgresql
+brew uninstall postgresql
+```
+
+- Remove data files (irreversible):
+
+```bash
+rm -rf /usr/local/var/postgres   # Intel Mac
+rm -rf /opt/homebrew/var/postgres # Apple Silicon Mac
 ```
 
 ### Source-based / Custom installs
