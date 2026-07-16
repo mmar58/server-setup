@@ -10,14 +10,24 @@ Redis is an in-memory data structure store used as a database, cache, and messag
   - CentOS/RHEL: use EPEL or build from source.
 - Docker (recommended for quick testing):
   - `docker run --name redis -p 6379:6379 -d redis:latest`
-- macOS: `brew install redis`
+- macOS:
+  - Install Redis via Homebrew: `brew install redis`
 - Windows: Use WSL or the official Microsoft port alternatives; Docker is recommended on Windows.
 
 After install, start the server:
 
-```
-sudo systemctl enable --now redis-server
-```
+- **Linux (systemd):**
+  ```bash
+  sudo systemctl enable --now redis-server
+  ```
+
+- **macOS (Homebrew):**
+  To start Redis as a background service:
+  ```bash
+  brew services start redis
+  ```
+  *(Alternatively, to run it in the foreground: `redis-server`)*
+
 
 Or with Docker the container starts automatically.
 
