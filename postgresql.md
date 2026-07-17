@@ -26,12 +26,22 @@ or
 ```bash
 sudo -u postgres psql
 ```
+For Mac
+```bash
+psql postgres
+```
 
 Then in psql:
 
 ```sql
 ALTER USER postgres WITH PASSWORD '123456';
 \q
+```
+
+Or in mac
+Create postgresql user
+```sql
+CREATE ROLE postgres WITH LOGIN SUPERUSER PASSWORD '123456';
 ```
 
 ### A2) Configure PostgreSQL to listen on LAN
