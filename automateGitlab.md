@@ -4,6 +4,11 @@ Tired of typing your username and password every time you `git push` or `git pul
 
 ---
 
+## To remove already set password
+```bash
+ssh-keygen -p -f ~/.ssh/id_ed25519
+```
+
 ## 🔑 Method 1: SSH Keys (Recommended)
 
 **Best for:** Security, professional workflows, and permanent setups.

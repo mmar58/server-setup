@@ -10,6 +10,110 @@ Example:
 
 ## Installation (Ubuntu/Debian)
 
+
+## Section A - Windows (Laragon)
+
+### A1) Set or change `postgres` password
+
+Open Laragon Terminal:
+
+```bash
+psql -U postgres
+```
+or
+```bash
+sudo -u postgres psql
+```
+For Mac
+```bash
+psql postgres
+```
+
+Then in psql:
+
+```sql
+ALTER USER postgres WITH PASSWORD '123456';
+\q
+```
+
+Or in mac
+Create postgresql user
+```sql
+CREATE ROLE postgres WITH LOGIN SUPERUSER PASSWORD '123456';
+```
+
+### A2) Configure PostgreSQL to listen on LAN
+
+Typical Laragon path:
+
+```text
+C:\laragon\data\postgresql
+```
+
+Edit `postgresql.conf`:
+
+```ini
+listen_addresses = '*'
+```
+
+Edit `pg_hba.conf` and add one rule at the bottom (example):
+
+```text
+host    all    all    192.168.1.0/24    scram-sha-256
+```
+## CIDR cheat sheet (`pg_hba.conf`)
+
+| CIDR | Meaning | Typical use |
+|---|---|---|
+| `192.168.1.0/24` | only `192.168.1.x` | recommended in homes/small offices |
+| `192.168.0.0/16` | any `192.168.x.x` | broader private LAN access |
+| `10.0.0.0/8` | any `10.x.x.x` | enterprise/private networks |
+| `0.0.0.0/0` | any IPv4 address | avoid unless absolutely necessary |
+
+Use the narrowest subnet possible.
+
+---
+
+### A3) Open Windows Firewall (port `5432`)
+
+PowerShell (Run as Administrator):
+
+```powershell
+New-NetFirewallRule -DisplayName "PostgreSQL (Laragon)" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 5432
+```
+
+Optional hardening (restrict source subnet):
+
+```powershell
+Set-NetFirewallRule -DisplayName "PostgreSQL (Laragon)" -RemoteAddress 192.168.1.0/24
+```
+
+### A4) Restart and verify
+
+Restart from Laragon UI (Stop -> Start All), then verify:
+
+```powershell
+netstat -ano | findstr :5432
+```
+
+Find local IP:
+
+```bash
+ipconfig
+```
+
+Remote test from another machine:
+
+```bash
+psql -h your_windows_ip -p 5432 -U postgres -d postgres
+```
+
+---
+
+## Section B - Linux (Ubuntu/Debian)
+
+### B1) Install PostgreSQL
+
 ```bash
 sudo apt update
 sudo apt install -y postgresql postgresql-contrib
@@ -126,6 +230,114 @@ psql -h your_linux_ip -p 5432 -U postgres -d postgres
 ## Memory Configuration
 
 PostgreSQL's default memory settings are often too conservative for modern servers (designed to run on older systems with very little RAM). To optimize performance, you should adjust these settings in `postgresql.conf` based on your server's available RAM.
+## Section C - macOS (Homebrew)
+
+### C1) Install PostgreSQL
+
+Using [Homebrew](https://brew.sh/):
+
+```bash
+brew update
+brew install postgresql
+```
+
+Start the service so it runs in the background and restarts at login:
+
+```bash
+brew services start postgresql
+```
+
+Check status:
+
+```bash
+brew services info postgresql
+psql --version
+```
+
+### C2) Connect and set password
+
+Homebrew installs PostgreSQL and automatically creates a superuser with your macOS username, rather than a `postgres` user by default. The default database is `postgres`.
+
+Log in:
+
+```bash
+psql postgres
+```
+
+(Optional) Create a `postgres` user for consistency with other systems:
+
+```sql
+CREATE ROLE postgres WITH LOGIN SUPERUSER PASSWORD '123456';
+\q
+```
+
+Or just change your current macOS user's database password:
+
+```sql
+ALTER USER CURRENT_USER WITH PASSWORD 'your_new_secure_password';
+\q
+```
+
+### C3) Locate active config files
+
+```bash
+psql postgres -t -P format=unaligned -c "SHOW config_file;"
+psql postgres -t -P format=unaligned -c "SHOW hba_file;"
+```
+*(Typical locations: `/usr/local/var/postgres/` on Intel Macs, `/opt/homebrew/var/postgres/` on Apple Silicon)*
+
+### C4) Configure network access
+
+Edit `postgresql.conf` (using the path found above):
+
+```ini
+listen_addresses = '*'
+```
+
+Edit `pg_hba.conf` (append at bottom):
+
+```text
+host    all    all    192.168.1.0/24    scram-sha-256
+```
+
+Restart to apply changes:
+
+```bash
+brew services restart postgresql
+```
+
+### C5) Open macOS Firewall
+
+If the built-in macOS Application Firewall is enabled:
+1. Open **System Settings** > **Network** > **Firewall** (or **System Preferences** > **Security & Privacy** > **Firewall** on older versions).
+2. Click **Options...** or **Firewall Options...**
+3. Click the **+** button, press `Cmd + Shift + G`, and enter the path to the `postgres` executable (e.g., `/opt/homebrew/opt/postgresql/bin/postgres` or `/usr/local/opt/postgresql/bin/postgres`).
+4. Set it to **Allow incoming connections**.
+5. Click **OK**.
+
+### C6) Verify listener and remote access
+
+Check if it's listening on port 5432:
+
+```bash
+lsof -i :5432
+```
+
+Find local IP:
+
+```bash
+ipconfig getifaddr en0
+```
+
+Remote test from another machine on the LAN:
+
+```bash
+psql -h your_mac_ip -p 5432 -U postgres -d postgres
+```
+
+---
+
+## Client connection settings
 
 Edit `postgresql.conf`:
 ```bash
@@ -403,3 +615,77 @@ Remove data files (irreversible):
 sudo rm -rf /var/lib/postgresql /etc/postgresql /var/log/postgresql /var/run/postgresql
 sudo deluser --remove-home postgres || sudo userdel -r postgres || true
 ```
+
+### RHEL / CentOS / Fedora (DNF/YUM)
+
+```bash
+sudo systemctl stop postgresql
+sudo dnf remove -y postgresql-server postgresql-contrib || sudo yum remove -y postgresql-server postgresql-contrib
+sudo rm -rf /var/lib/pgsql /var/lib/pgsql/data /var/log/postgresql
+sudo userdel -r postgres || true
+```
+
+### Arch Linux (pacman)
+
+```bash
+sudo systemctl stop postgresql
+sudo pacman -Rns --noconfirm postgresql
+sudo rm -rf /var/lib/postgres /var/log/postgres
+sudo userdel -r postgres || true
+```
+
+### macOS (Homebrew)
+
+```bash
+brew services stop postgresql
+brew uninstall postgresql
+```
+
+- Remove data files (irreversible):
+
+```bash
+rm -rf /usr/local/var/postgres   # Intel Mac
+rm -rf /opt/homebrew/var/postgres # Apple Silicon Mac
+```
+
+### Source-based / Custom installs
+
+- If PostgreSQL was compiled from source or installed in a custom prefix, remove the installation directory and data dir manually. Check `which postgres` and `pg_config --bindir`.
+
+### Docker / Container installs
+
+- Remove containers and images:
+
+```bash
+docker rm -f <container_name_or_id>
+docker rmi <image_name_or_id>
+```
+
+- Remove volume if used:
+
+```bash
+docker volume rm <volume_name>
+```
+
+### Clean up apt sources and keys (if you added PostgreSQL repo)
+
+```bash
+# Remove external APT source list (example)
+sudo rm -f /etc/apt/sources.list.d/pgdg.list
+sudo apt-key del <KEYID> || true
+sudo apt update
+```
+
+### Verify removal
+
+```bash
+which psql || echo "psql not found"
+sudo ss -tulpen | grep 5432 || echo "no listener on 5432"
+```
+
+### Notes
+
+- `purge` or `--purge` removes packaged config files; it may not remove database data.
+- Always back up `/var/lib/postgresql` (or your data directory) before deleting.
+- Removing the `postgres` system user may affect other services if they rely on it.
+
