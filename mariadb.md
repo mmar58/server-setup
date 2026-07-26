@@ -70,6 +70,34 @@ FLUSH PRIVILEGES;
 EXIT;
 ```
 
+### Allow Root Access Over the Network (Remote Root Login)
+
+> [!WARNING]
+> Allowing `root` access from anywhere (`'%'`) across the network poses a significant security risk. Ensure you use a strong password and restrict access to trusted IP addresses using UFW/firewall rules whenever possible.
+
+By default, the `root` user can only connect from `localhost`. To permit the `root` user to log in remotely from any IP address over the network:
+
+1. Connect to MariaDB locally on the server:
+   ```bash
+   sudo mysql -u root -p
+   ```
+
+2. Create the remote `root` user and grant full administrative privileges across all databases:
+   ```sql
+   -- Create root user allowed to connect from any IP address ('%')
+   CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '123456';
+
+   -- Or if 'root'@'%' already exists, set/update the password:
+   -- ALTER USER 'root'@'%' IDENTIFIED BY '123456';
+
+   -- Grant all administrative privileges with GRANT OPTION
+   GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+   FLUSH PRIVILEGES;
+   EXIT;
+   ```
+
+3. Ensure that `bind-address = 0.0.0.0` is configured in `/etc/mysql/mariadb.conf.d/50-server.cnf` (or `/etc/my.cnf`) and port `3306` is open in your firewall (as described in the sections above).
+
 ## Memory Configuration & Optimization
 
 ### How Memory Works in MariaDB
