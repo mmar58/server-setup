@@ -8,7 +8,7 @@ Here is your step-by-step guide to slowly transitioning your backend without bre
 You need the TypeScript compiler, an execution engine for development, and the type definition files for Node and Express.
 
 ```bash
-npm install -D typescript @types/node @types/express ts-node nodemon
+npm install -D typescript @types/node @types/express tsx nodemon
 
 ```
 
@@ -47,12 +47,12 @@ Update the generated file with these crucial settings. The absolute most importa
 
 ### Phase 2: Update Build and Dev Scripts
 
-Update your `package.json` to handle compilation and local development. Using `ts-node` allows you to run `.ts` and `.js` files directly in development without having to constantly compile them to the `dist` folder.
+Update your `package.json` to handle compilation and local development. Using `tsx` allows you to run `.ts` and `.js` files directly in development without having to constantly compile them to the `dist` folder.
 
 ```json
 "scripts": {
   "start": "node dist/index.js",
-  "dev": "nodemon --watch src --ext js,ts --exec ts-node src/index.js",
+  "dev": "nodemon --watch src --ext js,ts --exec tsx src/index.js",
   "build": "tsc"
 }
 
