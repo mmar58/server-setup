@@ -306,6 +306,114 @@ sudo tail -n 20 /var/log/nginx/error.log
 
 ---
 
+## Important Configs and Tricks
+
+### Reverse Proxy (Most Common)
+
+This configuration transparently forwards the incoming request from Nginx to your backend API. The client's browser or application URL remains unchanged.
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    location /api/ {
+        # Forward requests to your specific API server
+        proxy_pass http://127.0.0.1:8080/;
+
+        # Pass essential headers to the backend
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+### 1. Gzip Compression (Speed up responses)
+
+Add this inside your `http { }` block in `/etc/nginx/nginx.conf` to compress text-based responses:
+
+```nginx
+gzip on;
+gzip_vary on;
+gzip_proxied any;
+gzip_comp_level 6;
+gzip_types text/plain text/css text/xml application/json application/javascript application/rss+xml application/atom+xml image/svg+xml;
+```
+
+### 2. Rate Limiting (Prevent DDoS / Brute Force)
+
+Define a rate limit zone in `nginx.conf` (`http { }` block):
+
+```nginx
+# 1 request per second per IP
+limit_req_zone $binary_remote_addr zone=mylimit:10m rate=1r/s;
+```
+
+Apply it to a specific route (like a login endpoint) in your site config:
+
+```nginx
+location /api/login {
+    limit_req zone=mylimit burst=5 nodelay;
+    proxy_pass http://localhost:3000;
+}
+```
+
+### 3. Load Balancing
+
+Distribute traffic across multiple instances of your app (e.g., PM2 instances on different ports):
+
+```nginx
+upstream backend_servers {
+    server 127.0.0.1:3000;
+    server 127.0.0.1:3001;
+    server 127.0.0.1:3002;
+}
+
+server {
+    listen 80;
+    server_name api.yourdomain.com;
+
+    location / {
+        proxy_pass http://backend_servers;
+    }
+}
+```
+
+### 4. Allow Large File Uploads
+
+Fix the `413 Request Entity Too Large` error by increasing the max body size (default is 1MB). Add this to `http { }`, `server { }`, or `location { }`:
+
+```nginx
+client_max_body_size 50M; # Allow up to 50 MB
+```
+
+### 5. Security Headers
+
+Enhance security by adding these headers in your `server { }` block:
+
+```nginx
+add_header X-Frame-Options "SAMEORIGIN";
+add_header X-XSS-Protection "1; mode=block";
+add_header X-Content-Type-Options "nosniff";
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+```
+
+### 6. Redirect www to non-www (and HTTP to HTTPS)
+
+If you aren't using Certbot to handle redirects, you can do it manually:
+
+```nginx
+server {
+    listen 80;
+    server_name www.yourdomain.com;
+    return 301 https://yourdomain.com$request_uri;
+}
+```
+
+---
+
 ## Useful Commands
 
 | Command | Description |
