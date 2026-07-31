@@ -8,7 +8,7 @@ Here is your step-by-step guide to slowly transitioning your backend without bre
 You need the TypeScript compiler, an execution engine for development, and the type definition files for Node and Express.
 
 ```bash
-npm install -D typescript @types/node @types/express tsx nodemon
+pnpm install -D typescript @types/node @types/express tsx nodemon
 
 ```
 
