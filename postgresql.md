@@ -631,7 +631,7 @@ brew install pgvector
 Extensions must be created on a per-database basis. Connect to your database using `psql` (or any GUI tool):
 
 ```bash
-psql -U postgres -d app_db
+sudo -u postgres psql -U postgres -d app_db
 ```
 
 Then run the following SQL command to enable the extension:
