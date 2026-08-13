@@ -590,6 +590,121 @@ ORDER BY backend_start DESC;
 6. Restart PostgreSQL
 7. Test with `psql` from another machine
 
+## pgvector Extension
+
+[pgvector](https://github.com/pgvector/pgvector) is an open-source vector similarity search extension for PostgreSQL. It is highly useful for storing and querying AI embeddings.
+
+### 1) Installation
+
+**Linux (Ubuntu/Debian):**
+
+The easiest way to install pgvector on Ubuntu/Debian is via the official PostgreSQL APT repository or compiling from source.
+
+Method A: Using APT (Recommended if you use the PostgreSQL repo)
+```bash
+sudo apt update
+# Replace 15 with your specific PostgreSQL version (e.g., 14, 16)
+sudo apt install postgresql-15-pgvector
+```
+
+Method B: Compile from source
+```bash
+sudo apt update
+sudo apt install postgresql-server-dev-all gcc make
+cd /tmp
+git clone --branch v0.8.0 https://github.com/pgvector/pgvector.git
+cd pgvector
+make
+sudo make install
+```
+
+**macOS (Homebrew):**
+
+If you installed PostgreSQL via Homebrew, you can install pgvector easily:
+
+```bash
+brew install pgvector
+```
+
+### 2) Enable pgvector for a Database
+
+Extensions must be created on a per-database basis. Connect to your database using `psql` (or any GUI tool):
+
+```bash
+psql -U postgres -d app_db
+```
+
+Then run the following SQL command to enable the extension:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS vector;
+```
+
+To verify it is installed, you can check the installed extensions:
+
+```sql
+\dx
+```
+
+### 3) Usage
+
+Once enabled, you can use the `vector` data type and perform similarity searches.
+
+**Create a table with a vector column:**
+
+Specify the dimensions of your vectors (e.g., 1536 for OpenAI `text-embedding-3-small` embeddings, or 384 for standard SentenceTransformers).
+
+```sql
+CREATE TABLE items (
+    id bigserial PRIMARY KEY,
+    name text,
+    embedding vector(3) -- 3 dimensions for this example
+);
+```
+
+**Insert vectors:**
+
+```sql
+INSERT INTO items (name, embedding) VALUES 
+('Item A', '[1.0, 2.0, 3.0]'),
+('Item B', '[4.0, 5.0, 6.0]'),
+('Item C', '[1.1, 2.1, 3.1]');
+```
+
+**Perform a similarity search:**
+
+You can calculate distances to find the most similar items to a target vector. `pgvector` supports:
+- `<->` L2 distance (Euclidean)
+- `<#>` (negative) Inner product
+- `<=>` Cosine distance
+
+Example: Find the top 2 items closest to `[1.0, 2.0, 3.0]` using Cosine distance:
+
+```sql
+SELECT id, name, embedding, embedding <=> '[1.0, 2.0, 3.0]' AS cosine_distance
+FROM items
+ORDER BY embedding <=> '[1.0, 2.0, 3.0]'
+LIMIT 2;
+```
+
+**Add an index for faster queries:**
+
+If you have millions of rows, you should create an index to speed up vector search. HNSW (Hierarchical Navigable Small World) is the recommended index type in newer versions of pgvector.
+
+```sql
+-- For cosine distance index
+CREATE INDEX ON items USING hnsw (embedding vector_cosine_ops);
+
+-- For L2 distance index
+CREATE INDEX ON items USING hnsw (embedding vector_l2_ops);
+
+-- For inner product index
+CREATE INDEX ON items USING hnsw (embedding vector_ip_ops);
+```
+
+> [!TIP]
+> Always build your HNSW index *after* inserting some initial data for better index structure. You can also adjust the `m` and `ef_construction` parameters to fine-tune recall vs. build time.
+
 ## Uninstalling PostgreSQL (Linux)
 
 > [!WARNING]
