@@ -136,6 +136,9 @@ pm2 install pm2-logrotate
 # Configure rotation (optional)
 pm2 set pm2-logrotate:max_size 2M   # Rotate (archive & start fresh) when a log file exceeds 2 MB
 pm2 set pm2-logrotate:retain 20      # Keep at most 6 rotated log files per app; older ones are deleted
+
+# Uninstall pm2-logrotate
+pm2 uninstall pm2-logrotate
 ```
 
 ---
