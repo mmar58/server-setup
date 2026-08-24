@@ -49,9 +49,9 @@ server {
     listen 80;
     listen [::]:80;
 
-    server_name www.famstrack.com;
+    server_name usermanagement.anzdevelopers.com;
 
-    root /var/www/socialapp.anzdevelopers.com;
+    root /var/www/usermanagement.anzdevelopers.com;
     index index.html index.htm;
 
     location / {
@@ -71,11 +71,11 @@ server {
 ### Set up the static files directory
 
 ```bash
-sudo mkdir -p /var/www/socialapp.anzdevelopers.com
-sudo chown -R $USER:$USER /var/www/socialapp.anzdevelopers.com
+sudo mkdir -p /var/www/usermanagement.anzdevelopers.com
+sudo chown -R $USER:$USER /var/www/usermanagement.anzdevelopers.com
 
 # Copy your build output here, e.g.:
-cp -r ./out/* /var/www/socialapp.anzdevelopers.com/
+cp -r ./frontend/* /var/www/usermanagement.anzdevelopers.com/
 ```
 
 
@@ -88,7 +88,7 @@ Use this when you have a Node.js (or any other) app running on a local port (e.g
 ### Create the config
 
 ```bash
-sudo nano /etc/nginx/sites-available/www.famstrack.com
+sudo nano /etc/nginx/sites-available/apiusermanagement.anzdevelopers.com
 ```
 
 ```nginx
@@ -96,10 +96,10 @@ server {
     listen 80;
     listen [::]:80;
 
-    server_name testapi.famstrack.com;
+    server_name apiusermanagement.anzdevelopers.com;
 
     location / {
-        proxy_pass http://localhost:4001;
+        proxy_pass http://localhost:5000;
         proxy_buffer_size          128k;
         proxy_buffers              4 256k;
         proxy_busy_buffers_size    256k;
@@ -126,7 +126,7 @@ After creating your config in `sites-available/`, enable it:
 
 ```bash
 # Create symlink to enable the site
-sudo ln -s /etc/nginx/sites-available/www.famstrack.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/apiusermanagement.anzdevelopers.com /etc/nginx/sites-enabled/
 
 # Test for syntax errors
 sudo nginx -t
@@ -145,7 +145,7 @@ sudo systemctl reload nginx
 sudo apt install certbot python3-certbot-nginx -y
 
 # Obtain and auto-configure SSL certificate
-sudo certbot --nginx -d api.famstrack.com,test.famstrack.com,testapi.famstrack.com
+sudo certbot --nginx -d apiusermanagement.anzdevelopers.com
 
 # Certbot will automatically modify your nginx config to handle HTTPS and redirect HTTP → HTTPS
 ```
