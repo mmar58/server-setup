@@ -138,6 +138,55 @@ sudo systemctl reload nginx
 
 ---
 
+## Managing Sites (Remove or Rename)
+
+### Removing a Site
+
+To stop serving a site (whether static or proxy):
+
+1. **Remove the symlink** from `sites-enabled`:
+   ```bash
+   sudo rm /etc/nginx/sites-enabled/yourdomain.com
+   ```
+2. **(Optional) Remove the configuration file** from `sites-available`:
+   ```bash
+   sudo rm /etc/nginx/sites-available/yourdomain.com
+   ```
+3. **Reload Nginx**:
+   ```bash
+   sudo systemctl reload nginx
+   ```
+
+### Renaming a Site
+
+To change the domain name of an existing site:
+
+1. **Rename the config file** in `sites-available`:
+   ```bash
+   sudo mv /etc/nginx/sites-available/olddomain.com /etc/nginx/sites-available/newdomain.com
+   ```
+2. **Update the `server_name`** inside the renamed config file:
+   ```bash
+   sudo nano /etc/nginx/sites-available/newdomain.com
+   ```
+   *Change `server_name olddomain.com;` to `server_name newdomain.com;` (and update `root` path if applicable).*
+3. **Remove the old symlink**:
+   ```bash
+   sudo rm /etc/nginx/sites-enabled/olddomain.com
+   ```
+4. **Create a new symlink**:
+   ```bash
+   sudo ln -s /etc/nginx/sites-available/newdomain.com /etc/nginx/sites-enabled/
+   ```
+5. **Test and reload**:
+   ```bash
+   sudo nginx -t
+   sudo systemctl reload nginx
+   ```
+
+
+---
+
 ## Adding HTTPS with Certbot (Let's Encrypt)
 
 ```bash
